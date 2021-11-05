@@ -19,9 +19,9 @@ def get_did_from_url():
     try:
         r = requests.get(DID_URL)
         r.raise_for_status()
-        return r.json()
     except Exception:
         print("Got exception fetching DID")
+    return r.json()
 
 
 def main():
