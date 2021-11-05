@@ -1,0 +1,5 @@
+cwt
+Pillow
+pyyaml
+pyzbar
+requests
