@@ -4,6 +4,7 @@ import argparse
 import base64
 import json
 import sys
+import uuid
 import yaml
 
 import cwt
@@ -53,6 +54,11 @@ def print_cwt(cwt):
 
         if claim_name in ('nbf', 'exp'):
             value = datetime.fromtimestamp(value, tz=timezone.utc)
+
+        if claim_name == 'cti':
+            # Convert CTI to JTI
+            claim_name = 'jti'
+            value = 'urn:uuid:' + str(uuid.UUID(value.hex()))
 
         print(f"{claim_name}: {value}")
 
