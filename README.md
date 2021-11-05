@@ -29,9 +29,9 @@ You can try with the sample QR codes provided:
 ```
 $ python3 nz_covid_pass_verifier.py --qrcode-file examples/valid/nzcp.png --did-file examples/valid/did.json
 
-1: did:web:nzcp.covid19.health.nz
-5: 1635883530
-4: 1951416330
+iss: did:web:nzcp.covid19.health.nz
+nbf: 2021-11-02 20:05:30+00:00
+exp: 2031-11-02 20:05:30+00:00
 vc:
   '@context':
   - https://www.w3.org/2018/credentials/v1
@@ -44,6 +44,5 @@ vc:
   - VerifiableCredential
   - PublicCovidPass
   version: 1.0.0
-7: !!binary |
-  YKT1TU4wQzK+M614ser6Sw==
+jti: urn:uuid:60a4f54d-4e30-4332-be33-ad78b1eafa4b
 ```
