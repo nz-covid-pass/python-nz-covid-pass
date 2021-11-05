@@ -16,6 +16,7 @@ DID_URL = 'https://nzcp.identity.health.nz/.well-known/did.json'
 
 
 def get_did_from_url():
+    """Fetch DID document with public verification keys from URL"""
     try:
         r = requests.get(DID_URL)
         r.raise_for_status()
@@ -47,27 +48,35 @@ def main():
     args = parser.parse_args()
 
     if args.did_file:
+        # Get public verification keys from file
         with open(args.did_file, encoding='utf-8') as did_file:
             did = json.load(did_file)
     else:
+        # Get public verification keys from URL
         did = get_did_from_url()
 
     verification_keys = get_verification_keys(did)
 
+    # Decode any valid QR codes in the image file
     qrcodes = pyzbar.pyzbar.decode(PIL.Image.open(args.qrcode_file))
 
     for qrcode in qrcodes:
         qrcode_data_segments = qrcode.data.decode().split('/')
 
         if qrcode_data_segments[0] != 'NZCP:':
+            # Invalid
             continue
         if qrcode_data_segments[1] != '1':
+            # Invalid
             continue
 
+        # Decode base32 payload inside QR code
         qrcode_payload = base64.b32decode(qrcode_data_segments[2])
 
+        # Decode and verify CWT inside QR code
         qrcode_cwt = cwt.decode(qrcode_payload, keys=verification_keys)
 
+        # Print CWT
         yaml.dump(qrcode_cwt, sys.stdout)
 
 
