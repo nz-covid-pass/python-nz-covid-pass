@@ -55,19 +55,20 @@ def main():
     verification_keys = get_verification_keys(did)
 
     qrcodes = pyzbar.pyzbar.decode(PIL.Image.open(args.qrcode_file))
+
     for qrcode in qrcodes:
-        qrcode_segments = qrcode.data.decode().split('/')
+        qrcode_data_segments = qrcode.data.decode().split('/')
 
-        if qrcode_segments[0] != 'NZCP:':
+        if qrcode_data_segments[0] != 'NZCP:':
             continue
-        if qrcode_segments[1] != '1':
+        if qrcode_data_segments[1] != '1':
             continue
 
-        qr_data = base64.b32decode(qrcode_segments[2])
+        qrcode_payload = base64.b32decode(qrcode_data_segments[2])
 
+        qrcode_cwt = cwt.decode(qrcode_payload, keys=verification_keys)
 
-        qr_cwt = cwt.decode(qr_data, keys=verification_keys)
-        yaml.dump(qr_cwt, sys.stdout)
+        yaml.dump(qrcode_cwt, sys.stdout)
 
 
 if __name__ == "__main__":
