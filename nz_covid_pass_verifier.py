@@ -10,6 +10,7 @@ import cwt
 import requests
 import PIL.Image
 import pyzbar.pyzbar
+from datetime import datetime, timezone
 
 
 DID_URL = 'https://nzcp.identity.health.nz/.well-known/did.json'
@@ -36,6 +37,24 @@ def get_verification_keys(did):
                 cwt.COSEKey.from_jwk(verification_method['publicKeyJwk'])
             )
     return verification_keys
+
+
+def print_cwt(cwt):
+    """Pretty print a CWT object with claims"""
+    for key, value in cwt.to_dict().items():
+        if key == 'vc':
+            yaml.dump({'vc': value}, sys.stdout)
+            continue
+
+        claim_name = next(
+            (k for k, v in cwt._claim_names.items() if v == key),
+            key
+        )
+
+        if claim_name in ('nbf', 'exp'):
+            value = datetime.fromtimestamp(value, tz=timezone.utc)
+
+        print(f"{claim_name}: {value}")
 
 
 def main():
@@ -77,7 +96,7 @@ def main():
         qrcode_cwt = cwt.decode(qrcode_payload, keys=verification_keys)
 
         # Print CWT
-        yaml.dump(qrcode_cwt, sys.stdout)
+        print_cwt(cwt.Claims.new(qrcode_cwt))
 
 
 if __name__ == "__main__":
