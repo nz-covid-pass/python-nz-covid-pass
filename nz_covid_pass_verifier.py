@@ -24,6 +24,19 @@ def get_did_from_url():
     return r.json()
 
 
+def get_verification_keys(did):
+    """Get public verification keys from a DID document"""
+    verification_keys = []
+    for verification_method in did['verificationMethod']:
+        if verification_method['type'] == 'JsonWebKey2020':
+            kid = verification_method['id'].split('#')[1]
+            verification_method['publicKeyJwk']['kid'] = kid
+            verification_keys.append(
+                cwt.COSEKey.from_jwk(verification_method['publicKeyJwk'])
+            )
+    return verification_keys
+
+
 def main():
     parser = argparse.ArgumentParser(description='NZ COVID Pass Verifier.')
     parser.add_argument('--qrcode-file', type=str, required=True,
@@ -39,6 +52,8 @@ def main():
     else:
         did = get_did_from_url()
 
+    verification_keys = get_verification_keys(did)
+
     qrcodes = pyzbar.pyzbar.decode(PIL.Image.open(args.qrcode_file))
     for qrcode in qrcodes:
         qrcode_segments = qrcode.data.decode().split('/')
@@ -50,15 +65,6 @@ def main():
 
         qr_data = base64.b32decode(qrcode_segments[2])
 
-        verification_keys = []
-
-        for verification_method in did['verificationMethod']:
-            if verification_method['type'] == 'JsonWebKey2020':
-                kid = verification_method['id'].split('#')[1]
-                verification_method['publicKeyJwk']['kid'] = kid
-                verification_keys.append(
-                    cwt.COSEKey.from_jwk(verification_method['publicKeyJwk'])
-                )
 
         qr_cwt = cwt.decode(qr_data, keys=verification_keys)
         yaml.dump(qr_cwt, sys.stdout)
