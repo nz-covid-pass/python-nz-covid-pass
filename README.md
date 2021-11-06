@@ -19,6 +19,16 @@ $ sudo apt-get install python3-zbar
 
 ```
 usage: nz_covid_pass_verifier.py [-h] --qrcode-file QRCODE_FILE [--did-file DID_FILE]
+
+NZ COVID Pass Verifier.
+
+required arguments:
+  --qrcode-file QRCODE_FILE
+                        file name containing NZ COVID pass QR code
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --did-file DID_FILE   file name containing DID with verification keys
 ```
 
 Supply a QR code filename and optional DID document containing verification keys, if you omit
@@ -27,7 +37,7 @@ a DID document the official Ministry of Health verification keys will be used.
 You can try with the sample QR codes provided:
 
 ```
-$ python3 nz_covid_pass_verifier.py --qrcode-file examples/valid/nzcp.png --did-file examples/valid/did.json
+$ python3 nz_covid_pass_verifier.py --qrcode-file examples/moh/valid/nzcp.png --did-file examples/moh/valid/did.json
 
 iss: did:web:nzcp.covid19.health.nz
 nbf: 2021-11-02 20:05:30+00:00
