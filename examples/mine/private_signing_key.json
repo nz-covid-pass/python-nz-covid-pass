@@ -1,0 +1,9 @@
+{
+    "kid": "01",
+    "kty": "OKP",
+    "key_ops": ["sign"],
+    "alg": "EdDSA",
+    "crv": "Ed25519",
+    "x": "2E6dX83gqD_D0eAmqnaHe1TC1xuld6iAKXfw2OVATr0",
+    "d": "L8JS08VsFZoZxGa9JvzYmCWOwg7zaKcei3KZmYsj7dc"
+}

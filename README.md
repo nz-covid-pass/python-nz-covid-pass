@@ -1,7 +1,7 @@
-# Python NZ COVID Pass Verifier
+# Python NZ COVID Pass Verifier/Generator
 
-This is quick proof of concept verifier I coded up in ~2 hours using various libraries to
-parse the [NZ COVID Pass format](https://nzcp.covid19.health.nz/) as best as I could.
+This is quick proof of concept verifier I coded up in a few hours using various libraries to
+parse and generate QR codes in the [NZ COVID Pass format](https://nzcp.covid19.health.nz/).
 
 **Important note**: I don't know anything about CWT or CBOR and I'm using libraries that perform
 cryptographic functions that I haven't vetted. Do not use this code for anything other than
@@ -16,6 +16,7 @@ $ sudo apt-get install python3-zbar
 
 ## Usage
 
+### Verify NZ COVID Pass
 
 ```
 usage: nz_covid_pass_verifier.py [-h] --qrcode-file QRCODE_FILE [--did-file DID_FILE]
@@ -55,4 +56,36 @@ vc:
   - PublicCovidPass
   version: 1.0.0
 jti: urn:uuid:60a4f54d-4e30-4332-be33-ad78b1eafa4b
+```
+
+### Generate NZ COVID Pass
+
+```
+usage: nz_covid_pass_generator.py [-h] --signing-key-file SIGNING_KEY_FILE --qrcode-file QRCODE_FILE --dob DOB --given-name GIVEN_NAME --family-name FAMILY_NAME [--validity VALIDITY]
+
+NZ COVID Pass Generator.
+
+required arguments:
+  --signing-key-file SIGNING_KEY_FILE
+                        filename containing private signing key in JWK format
+  --qrcode-file QRCODE_FILE
+                        filename where QR code should be saved
+  --dob DOB             date of birth for COVID Pass
+  --given-name GIVEN_NAME
+                        given name for COVID Pass
+  --family-name FAMILY_NAME
+                        family name for COVID Pass
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --validity VALIDITY   validity of NZ COVID Pass in days, default: 365
+```
+
+Example:
+
+```
+python3 nz_covid_pass_generator.py \
+    --dob "1986-07-14" --given-name "SpongeBob" --family-name "SquarePants" \
+    --signing-key-file examples/mine/private_signing_key.json \
+    --qrcode-file examples/mine/spongebob-squarepants.png
 ```

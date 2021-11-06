@@ -2,4 +2,5 @@ cwt
 Pillow
 pyyaml
 pyzbar
+qrcode
 requests
