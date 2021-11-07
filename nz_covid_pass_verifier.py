@@ -95,6 +95,11 @@ def main():
             # Invalid
             continue
 
+        # Add Base32 padding back on if needed: https://nzcp.covid19.health.nz/#2d-barcode-encoding
+        unpadded_length = len(qrcode_data_segments[2]) % 8
+        if unpadded_length != 0:
+            qrcode_data_segments[2] += (8 - unpadded_length) * '='
+
         # Decode base32 payload inside QR code
         qrcode_payload = base64.b32decode(qrcode_data_segments[2])
 

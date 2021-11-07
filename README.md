@@ -10,8 +10,15 @@ learning and experimentation.
 ## Installing
 
 ```
-$ pip3 install -r requirements.txt
 $ sudo apt-get install python3-zbar
+$ pip3 install -r requirements.txt
+```
+
+## Docker
+
+```
+docker build -t nzcovidpass .
+docker run -v $(pwd):/app/qr --rm nzcovidpass --qrcode-file /app/qr/Image.jpg
 ```
 
 ## Usage
