@@ -96,3 +96,25 @@ python3 nz_covid_pass_generator.py \
     --signing-key-file examples/mine/private_signing_key.json \
     --qrcode-file examples/mine/spongebob-squarepants.png
 ```
+
+
+### Generate Private Signing Key
+```
+usage: nz_covid_pass_generate_key.py [-h] [--kid KID] --private-key-file PRIVATE_KEY_FILE --did-file DID_FILE
+
+NZ COVID Pass Generate Key.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --kid KID             key id to assign to the generated key
+  --private-key-file PRIVATE_KEY_FILE
+                        file name to save private key
+  --did-file DID_FILE   file name to save DID document
+```
+
+Example:
+```
+$ python3 nz_covid_pass_generate_key.py --private-key-file ./examples/p256/private_key.json --did-file examples/p256/did.json
+$ python3 nz_covid_pass_generator.py --signing-key-file ./examples/p256/private_key.json --qrcode-file ./examples/p256/patrick_star.png --dob 1960-04-16 --given-name Patrick --family-name Star
+$ python3 nz_covid_pass_verifier.py --qrcode-file ./examples/p256/patrick_star.png --did-file ./examples/p256/did.json
+```
