@@ -6,6 +6,7 @@ import json
 import uuid
 
 import cwt
+import cbor2
 import qrcode
 from datetime import datetime, timezone
 
@@ -78,11 +79,13 @@ def main():
         private_signing_key = cwt.COSEKey.from_jwk(json.load(signing_key_file))
 
     # Sign our CWT
-    cwt_encoder = NZCOVIDPassCWT()
-    cwt_token = cwt_encoder.encode(
-        cwt_claims,
-        private_signing_key
-    )
+    cwt_claims = cwt_claims.to_dict()
+    cwt.Claims.validate(cwt_claims)
+
+    ctx = cwt.COSE.new(alg_auto_inclusion=True, kid_auto_inclusion=True)
+    b_claims = cbor2.dumps(cwt_claims)
+    res = ctx.encode_and_sign(b_claims, private_signing_key, { 4: private_signing_key.kid }, {}, out="cbor2/CBORTag")
+    cwt_token = cbor2.dumps(res)
 
     # Create QR code data segments
     qrcode_data_segments = [
