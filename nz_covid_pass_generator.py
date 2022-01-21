@@ -6,6 +6,7 @@ import json
 import uuid
 
 import cwt
+import cbor2
 import qrcode
 from datetime import datetime, timezone
 
@@ -27,16 +28,20 @@ def main():
                         help='given name for COVID Pass')
     parser.add_argument('--family-name', type=str, required=True,
                         help='family name for COVID Pass')
+    parser.add_argument('--nbf', type=int, default=None,
+                        help='nbf of NZ COVID Pass, default: current time')
+    parser.add_argument('--cti', type=str, default=None,
+                        help='cti of NZ COVID Pass, default: uuidv4')
     parser.add_argument('--validity', type=int, default=365,
                         help='validity of NZ COVID Pass in days, default: 365')
 
     args = parser.parse_args()
 
     # Generate random CTI
-    cti = uuid.uuid4().bytes
+    cti = uuid.uuid4().bytes if args.cti is None else uuid.UUID(args.cti).bytes
 
     # Valid from now
-    nbf = int(datetime.utcnow().timestamp())
+    nbf = int(datetime.utcnow().timestamp()) if args.nbf == None else args.nbf
 
     # Set expiry date
     exp = nbf + (60 * 60 * 24 * args.validity)
@@ -74,11 +79,13 @@ def main():
         private_signing_key = cwt.COSEKey.from_jwk(json.load(signing_key_file))
 
     # Sign our CWT
-    cwt_encoder = NZCOVIDPassCWT()
-    cwt_token = cwt_encoder.encode(
-        cwt_claims,
-        private_signing_key
-    )
+    cwt_claims = cwt_claims.to_dict()
+    cwt.Claims.validate(cwt_claims)
+
+    ctx = cwt.COSE.new(alg_auto_inclusion=True, kid_auto_inclusion=True)
+    b_claims = cbor2.dumps(cwt_claims)
+    res = ctx.encode_and_sign(b_claims, private_signing_key, { 4: private_signing_key.kid }, {}, out="cbor2/CBORTag")
+    cwt_token = cbor2.dumps(res)
 
     # Create QR code data segments
     qrcode_data_segments = [
